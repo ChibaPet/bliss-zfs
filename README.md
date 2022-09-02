@@ -9,14 +9,25 @@ local repository. There's an overall metapackage that depends on the most
 recent two per-kernel metapackages, each of which depends on the ZFS
 packages needed to run ZFS on a particular kernel. The top-level
 metapackage also conflicts with linux-image-amd64 newer than the versions
-for which we've built OpenZFS kmods.
+for which we've built OpenZFS kmods. Everything but the top-level
+metapackage lives in a repository component directory tied to the major
+version of OpenZFS it represents.
+
+Using the naming in this repository, your sources.list might include:
+
+```
+deb http://repo.in.my.domain/debian bullseye main openzfs2.1
+```
+
+It'd pull bliss-zfs from main, and that would reference the appropriate
+files in (in this case) the openzfs2.1 component.
 
 This repository is churning a bit on its first day given gotchas when
 trying to install older versions of OpenZFS, distinguished only by package
 version. The current plan splits OpenZFS major version-related packages
-into their own component directories in the local. None of this was painful
-when only shipping a single major version of OpenZFS but this isn't
-sufficiently flexible.
+into their own component directories in the local repository. (None of this
+was painful when only shipping a single major version of OpenZFS but this
+isn't sufficiently flexible.)
 
 Build each metapackage with "dpkg-deb -b packagename" and populate your
 local repository as desired.
