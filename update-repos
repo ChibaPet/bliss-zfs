@@ -1,0 +1,82 @@
+#!/bin/sh
+
+ORIGIN="Blisses"
+LABEL="Blisses Debian GNU/Linux Repository"
+
+REPO="${HOME}/repository"
+RELEASES="bullseye buster"
+DISTS="main experimental"
+ARCHES="amd64 i386"
+SIGNER="mason@blisses.org"
+
+echo
+echo "Signing packages."
+export GPG_TTY=$(tty)
+for release in $RELEASES
+do
+    for dist in $DISTS
+    do
+        for arch in $ARCHES
+        do
+            echo "----------------------------------------------------------"
+            echo "Signing $release/$dist/binary-$arch"
+            cd $REPO/debian/dists/$release/$dist/binary-$arch
+            dpkg-sig --sign builder -m ${SIGNER} *deb
+        done
+    done
+done
+
+echo
+echo "Building: Packages Packages.gz"
+for release in $RELEASES
+do
+    for dist in $DISTS
+    do
+        for arch in $ARCHES
+        do
+            echo "----------------------------------------------------------"
+            echo "Cataloging $release/$dist/binary-$arch"
+            cd $REPO/debian
+            apt-ftparchive packages dists/$release/$dist/binary-$arch \
+                > dists/$release/$dist/binary-$arch/Packages
+            gzip -c dists/$release/$dist/binary-$arch/Packages \
+                > dists/$release/$dist/binary-$arch/Packages.gz
+        done
+    done
+done
+
+
+echo
+echo "Building: Release InRelease Release.gpg"
+for release in $RELEASES
+do
+    echo "----------------------------------------------------------"
+    echo "Generating release files for $release"
+    # XXX Find a better way.
+    SUITE="unknown"
+    if [ "$release" = "bullseye" ]; then
+        SUITE="stable"
+        VERSION="11.0"
+    fi
+    if [ "$release" = "buster" ]; then
+        SUITE="oldstable"
+        VERSION="10.0"
+    fi
+    if [ "$release" = "bookworm" ]; then
+        SUITE="testing"
+        VERSION="12.0"
+    fi
+    cd $REPO/debian/dists/$release
+    rm Release InRelease Release.gpg
+    apt-ftparchive \
+        -o APT::FTPArchive::Release::Origin="$ORIGIN" \
+        -o APT::FTPArchive::Release::Label="$LABEL" \
+        -o APT::FTPArchive::Release::Suite="$SUITE" \
+        -o APT::FTPArchive::Release::Codename="$release" \
+        -o APT::FTPArchive::Release::Version="$VERSION" \
+        -o APT::FTPArchive::Release::Architectures="$ARCHES" \
+        -o APT::FTPArchive::Release::Components="$DISTS" \
+        release . > Release
+    gpg --clearsign -o InRelease Release
+    gpg -abs -o Release.gpg Release
+done

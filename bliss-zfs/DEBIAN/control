@@ -1,0 +1,6 @@
+Package: bliss-zfs
+Maintainer: Mason Loring Bliss <mason@blisses.org>
+Version: 2022090200
+Architecture: all
+Depends: bliss-zfs-2.1
+Description: Blisses ZFS packaging
