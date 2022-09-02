@@ -5,7 +5,6 @@ LABEL="Blisses Debian GNU/Linux Repository"
 
 REPO="${HOME}/repository"
 RELEASES="bullseye buster"
-DISTS="main experimental"
 ARCHES="amd64 i386"
 SIGNER="mason@blisses.org"
 
@@ -14,6 +13,7 @@ echo "Signing packages."
 export GPG_TTY=$(tty)
 for release in $RELEASES
 do
+    DISTS=$(ls -d $REPO/debian/dists/$release/*/ | xargs -n 1 basename | tr '\n' ' ')
     for dist in $DISTS
     do
         for arch in $ARCHES
@@ -30,6 +30,7 @@ echo
 echo "Building: Packages Packages.gz"
 for release in $RELEASES
 do
+    DISTS=$(ls -d $REPO/debian/dists/$release/*/ | xargs -n 1 basename | tr '\n' ' ')
     for dist in $DISTS
     do
         for arch in $ARCHES
@@ -68,6 +69,7 @@ do
     fi
     cd $REPO/debian/dists/$release
     rm Release InRelease Release.gpg
+    DISTS=$(ls -d $REPO/debian/dists/$release/*/ | xargs -n 1 basename | tr '\n' ' ')
     apt-ftparchive \
         -o APT::FTPArchive::Release::Origin="$ORIGIN" \
         -o APT::FTPArchive::Release::Label="$LABEL" \

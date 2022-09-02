@@ -4,22 +4,31 @@ ZFS metapackaging for Debian
 This offers an example of how one might structure ZFS packaging for an
 internal repository for an organization.
 
-The overall structure includes a "bliss-zfs" metapackage that points to a
-metapackage which specifies the currently preferred version of OpenZFS.
-This metapackage conflicts with kernel packaging newer than a specific
-version of linux-image-amd64, so that we never install a kernel for which
-we've not yet built a ZFS kmod. It also depends on the latest two ZFS kmod
-packages we've built, each of which depends on its relevant kernel, the end
-result being that the package system wants to keep around the latest kernel
-we support and one kernel previous.
+This organizes OpenZFS major versions into components that live in the
+local repository. There's an overall metapackage that depends on the most
+recent two per-kernel metapackages, each of which depends on the ZFS
+packages needed to run ZFS on a particular kernel. The top-level
+metapackage also conflicts with linux-image-amd64 newer than the versions
+for which we've built OpenZFS kmods.
+
+This repository is churning a bit on its first day given gotchas when
+trying to install older versions of OpenZFS, distinguished only by package
+version. The current plan splits OpenZFS major version-related packages
+into their own component directories in the local. None of this was painful
+when only shipping a single major version of OpenZFS but this isn't
+sufficiently flexible.
 
 Build each metapackage with "dpkg-deb -b packagename" and populate your
 local repository as desired.
 
 When Debian releases a new kernel, create a new per-kernel kmod for each
-major version of OpenZFS you want to support, update the per-major-revision
-metapackage to bump the two kernels it wants and to conflict against
+major version of OpenZFS you want to support, update the top-level
+metapackage to bump the two kernels it wants, and to conflict against
 linux-image-amd64 newer than the new one that was just released, and your
 client systems ought to gracefully update kernel and ZFS together. (Note
 that if you update ZFS outside of a kernel bump, client systems will want
 to run depmod manually and then rebuild initramfs files.)
+
+Please report any errors found. I'd like this to be a reliable mechanism
+for sites that don't want to rely on DKMS across their infrastructures.
+(The carbon footprint alone is a compelling reason to avoid DKMS at scale.)
