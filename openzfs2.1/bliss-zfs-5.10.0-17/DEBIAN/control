@@ -1,0 +1,16 @@
+Package: bliss-zfs-5.10.0-17
+Maintainer: Mason Loring Bliss <mason@blisses.org>
+Version: 2022090202
+Architecture: all
+Depends: linux-image-amd64,
+ linux-image-5.10.0-17-amd64,
+ kmod-zfs-5.10.0-17-amd64,
+ zfs,
+ zfs-initramfs,
+ libnvpair3,
+ libuutil3,
+ libzfs5,
+ libzpool5,
+ python3-pyzfs
+Conflicts: libzfs4, libzpool4
+Description: Blisses ZFS packaging for 5.10.0-17.
