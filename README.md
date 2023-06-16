@@ -2,7 +2,12 @@
 ZFS metapackaging for Debian
 
 This offers an example of how one might structure ZFS packaging for an
-internal repository for an organization.
+internal repository for an organization. It describes metapackages that
+help make use of kmods built using the upstream OpenZFS instructions here:
+
+```
+https://openzfs.github.io/openzfs-docs/Developer%20Resources/Custom%20Packages.html
+```
 
 This organizes OpenZFS major versions into components that live in the
 local repository. There's an overall metapackage that depends on the most
@@ -21,13 +26,6 @@ deb http://repo.in.my.domain/debian bullseye main openzfs2.1
 
 It'd pull bliss-zfs from main, and that would reference the appropriate
 files in (in this case) the openzfs2.1 component.
-
-This repository is churning a bit on its first day given gotchas when
-trying to install older versions of OpenZFS, distinguished only by package
-version. The current plan splits OpenZFS major version-related packages
-into their own component directories in the local repository. (None of this
-was painful when only shipping a single major version of OpenZFS but this
-isn't sufficiently flexible.)
 
 Build each metapackage with "dpkg-deb -b packagename" and populate your
 local repository as desired.
