@@ -24,6 +24,18 @@ Using the naming in this repository, your sources.list might include:
 deb http://repo.in.my.domain/debian bullseye main openzfs2.1
 ```
 
+Note that I build the upstream "custom" packages in LXC containers, and
+hence avoid blindly building against the running kernel. You can achieve
+this as follows:
+
+```
+MYKERNEL=5.10.0-23-amd64
+./configure \
+    --with-linux=/lib/modules/$MYKERNEL/source \
+    --with-linux-obj=/lib/modules/$MYKERNEL/build
+make -j6 pkg-utils deb-kmod
+```
+
 It'd pull bliss-zfs from main, and that would reference the appropriate
 files in (in this case) the openzfs2.1 component.
 
