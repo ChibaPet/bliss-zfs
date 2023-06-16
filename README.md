@@ -21,8 +21,10 @@ version of OpenZFS it represents.
 Using the naming in this repository, your sources.list might include:
 
 ```
-deb http://repo.in.my.domain/debian bullseye main openzfs2.1
+deb http://repo.int.my.domain/debian bullseye openzfs2.1
 ```
+
+This will pull bliss-zfs from a local Bullseye openzfs2.1 component.
 
 Note that I build the upstream "custom" packages in LXC containers, and
 hence avoid blindly building against the running kernel. You can achieve
@@ -35,9 +37,6 @@ MYKERNEL=5.10.0-23-amd64
     --with-linux-obj=/lib/modules/$MYKERNEL/build
 make -j6 pkg-utils deb-kmod
 ```
-
-It'd pull bliss-zfs from main, and that would reference the appropriate
-files in (in this case) the openzfs2.1 component.
 
 Build each metapackage with "dpkg-deb -b packagename" and populate your
 local repository as desired.
